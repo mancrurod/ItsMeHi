@@ -32,7 +32,7 @@ genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 # === Constants ===
 QDRANT_URL = os.getenv("QDRANT_URL")
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
-VECTOR_SIZE = 384  # Assuming you use 'all-MiniLM-L6-v2' model
+VECTOR_SIZE = 384
 COLLECTION_NAME = "itsmehi_collection"
 
 # === Functions ===
@@ -85,23 +85,20 @@ def buscar_contexto_relevante(pregunta: str, client: QdrantClient, model: Senten
     documentos = [hit.payload["text"] for hit in search_result]
     return documentos
 
+MAX_CONTEXT_LENGTH = 3000  # Limitar a 3000 caracteres
 
 def generar_respuesta(contexto: List[str], pregunta: str) -> str:
-    """Generate a response using Gemini based on the retrieved context and the question.
-
-    Args:
-        contexto (List[str]): Retrieved context documents.
-        pregunta (str): Original question.
-
-    Returns:
-        str: Generated response.
-    """
+    """Generate a response using Gemini based on retrieved context and the question."""
     contexto_unido = "\n".join(contexto)
 
-    modelo = GenerativeModel(model_name="gemini-1.5-flash-latest")
+    # Cut context if it's too large
+    if len(contexto_unido) > MAX_CONTEXT_LENGTH:
+        contexto_unido = contexto_unido[:MAX_CONTEXT_LENGTH]
+
+    modelo = GenerativeModel(model_name="gemini-pro")  # Asegúrate que es gemini-pro
 
     prompt = (
-        f"Usando \u00fanicamente la siguiente informaci\u00f3n de contexto:\n\n"
+        f"Usando únicamente la siguiente información de contexto:\n\n"
         f"{contexto_unido}\n\n"
         f"Responde de forma clara y profesional a esta pregunta:\n"
         f"{pregunta}"
@@ -111,4 +108,6 @@ def generar_respuesta(contexto: List[str], pregunta: str) -> str:
         respuesta = modelo.generate_content(prompt)
         return respuesta.text.strip()
     except ResourceExhausted:
-        return "🚦 Hemos alcanzado el l\u00edmite de generaci\u00f3n de respuestas por minuto. Por favor, espere unos segundos y vuelva a intentarlo."
+        return "🚦 Hemos alcanzado el límite de generación. Intenta de nuevo en unos segundos."
+    except Exception:
+        return "⚡ El modelo no respondió a tiempo. Por favor, inténtalo de nuevo en unos minutos."
