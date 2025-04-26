@@ -25,9 +25,6 @@ from agent.rag_agent import (
     generar_respuesta
 )
 from sentence_transformers import SentenceTransformer
-# Load model forcing CPU
-model = SentenceTransformer('all-MiniLM-L6-v2', device='cpu')
-
 from logs.logger import guardar_logging
 
 # === Load Configuration ===
