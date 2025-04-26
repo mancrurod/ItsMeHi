@@ -9,7 +9,8 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 # === Load Environment Variables ===
-HUGGINGFACE_API_TOKEN = os.getenv("HUGGINGFACEHUB_API_TOKEN")
+HF_API_TOKEN = os.getenv("HUGGINGFACEHUB_API_TOKEN")
+HF_GENERATION_MODEL = os.getenv("HF_GENERATION_MODEL")
 
 # === Initialize Hugging Face Client ===
 client = InferenceClient(token=HUGGINGFACE_API_TOKEN)
