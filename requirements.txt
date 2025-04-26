@@ -1,0 +1,24 @@
+# Core web app
+streamlit==1.34.0
+
+# Text processing and embeddings
+sentence-transformers==2.7.0
+
+# Vector database
+chromadb==0.4.24
+
+# Machine learning utils
+scikit-learn==1.4.2
+pandas==2.2.2
+
+# Env management
+python-dotenv==1.0.1
+
+# Language detection
+langdetect==1.0.9
+
+# Optional: RAG framework
+llama-index==0.10.35
+
+# Gemini API access (instead of OpenAI)
+google-generativeai==0.4.1
