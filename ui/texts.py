@@ -15,10 +15,11 @@ TEXTOS = {
     },
     "bienvenida_descripcion": {
         "es": (
-            "Te invito a explorar mi perfil de una forma diferente: preguntándome directamente.\n\n"
+            "Le invito a explorar mi perfil de una forma diferente: preguntándome directamente.\n\n"
             "Vengo del mundo de las palabras, y ahora me muevo entre datos, modelos de lenguaje y soluciones creativas. "
-            "Si quieres saber cómo encajo en esta oferta o en tu proyecto, estoy aquí para responderte de forma clara, honesta y sin adornos innecesarios.\n\n"
-            "Cuando quieras, pulsa el botón y empezamos."
+            "Si quiere saber cómo encajo en esta oferta o en su proyecto, estoy aquí para responderle de forma clara, honesta y sin adornos innecesarios.\n\n"
+            "🔗 Puedes saber más sobre mí en [LinkedIn](https://www.linkedin.com/in/mancrurod/).\n\n"
+            "Cuando quiera, pulsa el botón y empezamos."
         ),
         "en": (
             "Welcome — here, you can explore my profile in a different way: by asking me directly.\n\n"
