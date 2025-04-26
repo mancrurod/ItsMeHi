@@ -14,9 +14,8 @@ import os
 from typing import List
 
 from dotenv import load_dotenv
-from sentence_transformers import SentenceTransformer
-# Load model forcing CPU
-model = SentenceTransformer('all-MiniLM-L12-v2', device='cpu')
+from vector_db.embedding_client import embed_text
+
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams
 from google.generativeai import GenerativeModel
@@ -74,7 +73,7 @@ def buscar_contexto_relevante(pregunta: str, client: QdrantClient, model: Senten
     Returns:
         List[str]: List of retrieved context passages.
     """
-    query_vector = model.encode(pregunta).tolist()
+    query_vector = membed_text(pregunta).tolist()
 
     search_result = client.search(
         collection_name=COLLECTION_NAME,

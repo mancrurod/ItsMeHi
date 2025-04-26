@@ -2,7 +2,7 @@
 streamlit==1.34.0
 
 # Text processing and embeddings
-sentence-transformers==2.7.0
+huggingface_hub==0.20.3  # Cliente oficial para llamar a HuggingFace Inference API
 
 # Vector database (Qdrant Cloud)
 qdrant-client==1.8.2
