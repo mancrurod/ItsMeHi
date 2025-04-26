@@ -25,7 +25,7 @@ from agent.rag_agent import (
     generar_respuesta
 )
 from sentence_transformers import SentenceTransformer
-from logs.logger import guardar_logging
+from vector_db.log_to_google_sheet import log_to_google_sheet
 
 # === Load Configuration ===
 CONFIG = cargar_configuracion()
@@ -110,7 +110,7 @@ def main() -> None:
             thinking_placeholder.empty()
 
             st.session_state["historial_chat"].append((st.session_state["input_text"], respuesta))
-            guardar_logging(st.session_state["input_text"], respuesta)
+            log_to_google_sheet(st.session_state["input_text"], respuesta)
 
             # Reset states after processing
             st.session_state["input_text"] = ""
