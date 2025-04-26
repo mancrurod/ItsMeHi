@@ -24,9 +24,6 @@ from vector_db.generate_response_hf import generar_respuesta_hf
 # === Load Environment Variables ===
 load_dotenv()
 
-# === Configure Gemini ===
-genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-
 # === Constants ===
 QDRANT_URL = os.getenv("QDRANT_URL")
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
