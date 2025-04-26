@@ -1,8 +1,15 @@
 import os
 import logging
+import httpx
 from typing import List
-
 from huggingface_hub import InferenceClient
+
+# === Create a reusable client with timeout and retries ===
+client = httpx.Client(
+    timeout=httpx.Timeout(20.0, connect=10.0),  # 20s total timeout, 10s to connect
+    limits=httpx.Limits(max_keepalive_connections=5, max_connections=10),
+    transport=httpx.HTTPTransport(retries=3),   # 3 automatic retries
+)
 
 # === Configure Logging ===
 logging.basicConfig(level=logging.INFO)
@@ -18,39 +25,20 @@ client = InferenceClient(token=HF_API_TOKEN)
 # === Constants ===
 MAX_OUTPUT_TOKENS = 100
 
-def generar_respuesta_hf(contexto: List[str], pregunta: str) -> str:
-    """
-    Generate a response using Hugging Face Inference API (tiiuae/falcon-7b-instruct).
-
-    Args:
-        contexto (List[str]): List of context passages.
-        pregunta (str): User's question.
-
-    Returns:
-        str: Generated answer from the model.
-    """
-    contexto_unido = "\n".join(contexto)
-
-    prompt = (
-        f"Use the following information to answer clearly and professionally.\n\n"
-        f"Context:\n{contexto_unido}\n\n"
-        f"Question:\n{pregunta}\n"
-    )
-
+def generar_respuesta_hf(contexto: str, pregunta: str) -> str:
+    payload = {
+        "inputs": f"Context: {contexto}\n\nQuestion: {pregunta}",
+        "parameters": {"max_new_tokens": 200},
+    }
+    headers = {
+        "Authorization": f"Bearer {HF_API_TOKEN}",
+        "Content-Type": "application/json",
+    }
     try:
-        logger.debug(f"\U0001F680 Sending prompt to HuggingFace (first 100 chars): {prompt[:100]}")
-
-        response = client.text_generation(
-            prompt,
-            model=HF_GENERATION_MODEL,
-            max_new_tokens=MAX_OUTPUT_TOKENS,
-            temperature=0.7,
-            top_p=0.9,
-            repetition_penalty=1.1
-        )
-
-        return response.strip()
-
+        response = client.post(HF_API_URL, headers=headers, json=payload)
+        response.raise_for_status()
+        data = response.json()
+        return data[0]["generated_text"] if data else "⚠️ No response generated."
     except Exception as e:
-        logger.error(f"⚡ Real error captured:\n{e}")
-        return "⚡ The model did not respond or took too long. Please try again later."
+        logger.error(f"❌ HuggingFace request failed: {e}")
+        return "⚠️ Unable to generate a response at the moment."
