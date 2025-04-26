@@ -11,11 +11,15 @@ qdrant-client==1.8.2
 scikit-learn==1.4.2
 pandas==2.2.2
 
-# Env management
+# Environment management
 python-dotenv==1.0.1
 
 # Language detection
 langdetect==1.0.9
+
+# Google Sheets logging
+gspread
+oauth2client
 
 # Optional: RAG framework
 llama-index==0.10.35
