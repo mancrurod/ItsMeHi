@@ -16,21 +16,22 @@ model_name = os.getenv("HF_GENERATION_MODEL")
 client = InferenceClient(token=api_token)
 
 def generar_respuesta_hf(prompt: str) -> str:
-    """Generate a response using Hugging Face Inference API with detailed debugging."""
+    """Generate a response using Hugging Face Inference API with timeout control."""
     try:
-        print(f"🚀 Enviando prompt a HuggingFace: {prompt[:100]}...")
+        print(f"🚀 Enviando prompt a HuggingFace...")
+        # Hacemos llamada limitada a máximo 30 segundos
         response = client.text_generation(
             prompt,
             model=model_name,
             max_new_tokens=256,
             temperature=0.7,
             stop_sequences=["###", "</s>"],
-            timeout=60,  # ⏱️ añadir timeout explícito (por si acaso)
+            timeout=30,  # ⏱️ Forzar timeout de cliente
         )
         print(f"✅ Respuesta recibida de HuggingFace.")
         return response.strip()
     except Exception as e:
         error_trace = traceback.format_exc()
-        print(f"⚡ Error real generado:\n{error_trace}")
-        st.error(f"⚡ Error interno: {str(e)}")  # Mostrar error resumido en pantalla
-        return "⚡ El modelo no respondió a tiempo. Por favor, inténtalo de nuevo en unos minutos."
+        print(f"⚡ Error real capturado:\n{error_trace}")
+        st.error(f"⚡ Error interno de generación: {str(e)}")
+        return "⚡ El modelo no respondió o tardó demasiado. Por favor, intenta de nuevo más tarde."
