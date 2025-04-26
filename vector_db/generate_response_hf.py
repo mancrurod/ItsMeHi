@@ -1,41 +1,60 @@
-# vector_db/generate_response_hf.py
-
 import os
 import logging
-import sys
+from typing import List
+
 from huggingface_hub import InferenceClient
 from dotenv import load_dotenv
-import streamlit as st
-import traceback
 
 # === Load environment variables ===
 load_dotenv()
 
-# === Setup logger ===
+# === Initialize Hugging Face Inference Client ===
+hf_token = os.getenv("HF_TOKEN")
+client = InferenceClient(token=hf_token)
+
+# === Constants ===
+MAX_TOKENS = 500
+
+# === Initialize logger ===
 logger = logging.getLogger(__name__)
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
-# === Connect to Hugging Face Inference API ===
-api_token = os.getenv("HF_API_TOKEN")
-model_name = os.getenv("HF_GENERATION_MODEL")
 
-client = InferenceClient(token=api_token)
+def generate_response_hf(context: List[str], question: str) -> str:
+    """Generates a response using a Hugging Face model.
 
-def generar_respuesta_hf(prompt: str) -> str:
-    """Generate a response using Hugging Face Inference API with forced error visibility."""
+    Args:
+        context (List[str]): List of relevant context paragraphs.
+        question (str): User's question.
+
+    Returns:
+        str: Generated answer.
+    """
+    # Merge context into a single string
+    context_combined = "\n".join(context)
+
+    # Build prompt
+    prompt = (
+        f"Use the following context to answer clearly and professionally.\n\n"
+        f"Context:\n\n{context_combined}\n\n"
+        f"Question:\n{question}\n\n"
+        f"Answer:"
+    )
+
+    # Debug log: first 100 characters of the prompt
+    logger.debug(f"🚀 Sending prompt to HuggingFace (first 100 chars): {prompt[:100]}")
+
     try:
-        logger.debug(f"🚀 Enviando prompt a HuggingFace (primeros 100 chars): {prompt[:100]}...")
+        # Send request to Hugging Face Inference API
         response = client.text_generation(
-            prompt,
-            model=model_name,
-            max_new_tokens=200,
-            temperature=0.7,
-            stop_sequences=["###", "</s>"]
+            model="tiiuae/falcon-7b-instruct",
+            prompt=prompt,
+            max_new_tokens=MAX_TOKENS,
+            temperature=0.5,
         )
-        logger.debug("✅ Respuesta recibida de HuggingFace.")
-        return response.strip()
+
+        # Extract and return the generated text
+        return response.generated_text.strip()
+
     except Exception as e:
-        error_trace = traceback.format_exc()
-        logger.error(f"⚡ Error real capturado:\n{error_trace}")
-        st.error(f"⚡ Error interno de generación: {str(e)}")
-        raise e  # 👈 Forzar re-lanzar la excepción para que Streamlit lo capture sí o sí
+        logger.error(f"⚡ Real error captured:\n\n{e}")
+        return "⚡ The model did not respond or took too long. Please try again later."
