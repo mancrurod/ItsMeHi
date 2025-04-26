@@ -16,7 +16,7 @@ client = InferenceClient(token=HUGGINGFACE_API_TOKEN)
 
 # === Constants ===
 MODEL_NAME = "tiiuae/falcon-7b-instruct"
-MAX_OUTPUT_TOKENS = 200  # Falcon models are relatively large, keep response small
+MAX_OUTPUT_TOKENS = 100  # Falcon models are relatively large, keep response small
 
 
 def generar_respuesta_hf(contexto: List[str], pregunta: str) -> str:
