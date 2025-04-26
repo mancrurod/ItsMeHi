@@ -28,10 +28,9 @@ def generar_respuesta_hf(prompt: str) -> str:
         response = client.text_generation(
             prompt,
             model=model_name,
-            max_new_tokens=256,
+            max_new_tokens=200,
             temperature=0.7,
-            stop_sequences=["###", "</s>"],
-            timeout=30,
+            stop_sequences=["###", "</s>"]
         )
         logger.debug("✅ Respuesta recibida de HuggingFace.")
         return response.strip()
