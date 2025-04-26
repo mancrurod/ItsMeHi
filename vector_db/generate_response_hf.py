@@ -15,7 +15,6 @@ HUGGINGFACE_API_TOKEN = os.getenv("HUGGINGFACEHUB_API_TOKEN")
 client = InferenceClient(token=HUGGINGFACE_API_TOKEN)
 
 # === Constants ===
-MODEL_NAME = "tiiuae/falcon-7b-instruct"
 MAX_OUTPUT_TOKENS = 100  # Falcon models are relatively large, keep response small
 
 
@@ -43,7 +42,7 @@ def generar_respuesta_hf(contexto: List[str], pregunta: str) -> str:
 
         response = client.text_generation(
             prompt,
-            model=MODEL_NAME,
+            model=HF_GENERATION_MODEL,
             max_new_tokens=MAX_OUTPUT_TOKENS,
             temperature=0.7,
             top_p=0.9,
