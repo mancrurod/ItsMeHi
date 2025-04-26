@@ -19,7 +19,9 @@ def embed_text(text: str) -> list:
         return []
     try:
         embedding = client.feature_extraction(text=text, model=model_name)
+        if not embedding or not isinstance(embedding, list):
+            raise ValueError("Embedding failed or empty.")
         return embedding
     except Exception as e:
         print(f"⚡ Error generating embedding: {e}")
-        return []
+        return None
