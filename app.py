@@ -15,25 +15,24 @@ from ui.layout import (
     mostrar_mensaje_bienvenida,
     mostrar_aviso_logging,
     mostrar_boton_empezar,
-    mostrar_input_pregunta,
     mostrar_footer_aviso_logging,
     mostrar_mensaje_recruiter,
     mostrar_mensaje_bot
 )
 from agent.rag_agent import (
-    cargar_chromadb,
+    cargar_qdrant,
     buscar_contexto_relevante,
     generar_respuesta
 )
+from sentence_transformers import SentenceTransformer
 from logs.logger import guardar_logging
 
 # === Load Configuration ===
 CONFIG = cargar_configuracion()
-COLLECTION_PATH = CONFIG["path_chromadb"]
 
 # === Load Knowledge Base ===
-collection_client = cargar_chromadb(str(COLLECTION_PATH))
-collection = collection_client.get_or_create_collection(name="itsmehi_collection")
+qdrant_client = cargar_qdrant()
+model = SentenceTransformer('all-MiniLM-L6-v2')
 
 # === Initialize Session State ===
 if "chat_started" not in st.session_state:
@@ -103,9 +102,9 @@ def main() -> None:
         # Process the question only if ready
         if st.session_state["input_ready"]:
             thinking_placeholder = st.empty()
-            thinking_placeholder.info("🤖 Thinking...")
+            thinking_placeholder.info("🤖 Pensando...")
 
-            contexto = buscar_contexto_relevante(st.session_state["input_text"], collection)
+            contexto = buscar_contexto_relevante(st.session_state["input_text"], qdrant_client, model)
             respuesta = generar_respuesta(contexto, st.session_state["input_text"])
 
             thinking_placeholder.empty()
@@ -118,8 +117,8 @@ def main() -> None:
             st.session_state["input_ready"] = False
 
             # Success and info messages
-            st.success("✅ Question sent successfully!")
-            st.info("🚦 Please wait a few seconds before submitting another question.")
+            st.success("✅ Pregunta enviada correctamente!")
+            st.info("🚦 Por favor, espere unos segundos antes de enviar otra pregunta.")
 
             st.rerun()
 
