@@ -3,58 +3,55 @@ import logging
 from typing import List
 
 from huggingface_hub import InferenceClient
-from dotenv import load_dotenv
 
-# === Load environment variables ===
-load_dotenv()
-
-# === Initialize Hugging Face Inference Client ===
-hf_token = os.getenv("HF_TOKEN")
-client = InferenceClient(token=hf_token)
-
-# === Constants ===
-MAX_TOKENS = 500
-
-# === Initialize logger ===
+# === Configure Logging ===
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+# === Load Environment Variables ===
+HUGGINGFACE_API_TOKEN = os.getenv("HUGGINGFACEHUB_API_TOKEN")
 
-def generate_response_hf(context: List[str], question: str) -> str:
-    """Generates a response using a Hugging Face model.
+# === Initialize Hugging Face Client ===
+client = InferenceClient(token=HUGGINGFACE_API_TOKEN)
+
+# === Constants ===
+MODEL_NAME = "tiiuae/falcon-7b-instruct"
+MAX_OUTPUT_TOKENS = 200  # Falcon models are relatively large, keep response small
+
+
+def generar_respuesta_hf(contexto: List[str], pregunta: str) -> str:
+    """
+    Generate a response using Hugging Face Inference API (tiiuae/falcon-7b-instruct).
 
     Args:
-        context (List[str]): List of relevant context paragraphs.
-        question (str): User's question.
+        contexto (List[str]): List of context passages.
+        pregunta (str): User's question.
 
     Returns:
-        str: Generated answer.
+        str: Generated answer from the model.
     """
-    # Merge context into a single string
-    context_combined = "\n".join(context)
+    contexto_unido = "\n".join(contexto)
 
-    # Build prompt
     prompt = (
-        f"Use the following context to answer clearly and professionally.\n\n"
-        f"Context:\n\n{context_combined}\n\n"
-        f"Question:\n{question}\n\n"
-        f"Answer:"
+        f"Use the following information to answer clearly and professionally.\n\n"
+        f"Context:\n{contexto_unido}\n\n"
+        f"Question:\n{pregunta}\n"
     )
 
-    # Debug log: first 100 characters of the prompt
-    logger.debug(f"🚀 Sending prompt to HuggingFace (first 100 chars): {prompt[:100]}")
-
     try:
-        # Send request to Hugging Face Inference API
+        logger.debug(f"\U0001F680 Sending prompt to HuggingFace (first 100 chars): {prompt[:100]}")
+
         response = client.text_generation(
-            model="tiiuae/falcon-7b-instruct",
-            prompt=prompt,
-            max_new_tokens=MAX_TOKENS,
-            temperature=0.5,
+            prompt,
+            model=MODEL_NAME,
+            max_new_tokens=MAX_OUTPUT_TOKENS,
+            temperature=0.7,
+            top_p=0.9,
+            repetition_penalty=1.1
         )
 
-        # Extract and return the generated text
-        return response.generated_text.strip()
+        return response.strip()
 
     except Exception as e:
-        logger.error(f"⚡ Real error captured:\n\n{e}")
+        logger.error(f"⚡ Real error captured:\n{e}")
         return "⚡ The model did not respond or took too long. Please try again later."
