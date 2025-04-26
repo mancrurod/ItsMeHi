@@ -24,7 +24,6 @@ from agent.rag_agent import (
     buscar_contexto_relevante,
     generar_respuesta
 )
-from sentence_transformers import SentenceTransformer
 from vector_db.log_to_google_sheet import log_to_google_sheet
 
 # === Load Configuration ===
@@ -32,7 +31,6 @@ CONFIG = cargar_configuracion()
 
 # === Load Knowledge Base ===
 qdrant_client = cargar_qdrant()
-model = SentenceTransformer('all-MiniLM-L6-v2')
 
 # === Initialize Session State ===
 if "chat_started" not in st.session_state:
@@ -104,7 +102,7 @@ def main() -> None:
             thinking_placeholder = st.empty()
             thinking_placeholder.info("🤖 Pensando...")
 
-            contexto = buscar_contexto_relevante(st.session_state["input_text"], qdrant_client, model)
+            contexto = buscar_contexto_relevante(st.session_state["input_text"], qdrant_client)
             respuesta = generar_respuesta(contexto, st.session_state["input_text"])
 
             thinking_placeholder.empty()

@@ -61,19 +61,18 @@ def cargar_qdrant() -> QdrantClient:
 
     return client
 
-def buscar_contexto_relevante(pregunta: str, client: QdrantClient, model: SentenceTransformer, k: int = 3) -> List[str]:
+def buscar_contexto_relevante(pregunta: str, client: QdrantClient, k: int = 3) -> List[str]:
     """Retrieve the most relevant context passages given a question.
 
     Args:
         pregunta (str): Recruiter's question.
         client (QdrantClient): Connected Qdrant client.
-        model (SentenceTransformer): Model to embed the question.
         k (int): Number of context chunks to retrieve.
 
     Returns:
         List[str]: List of retrieved context passages.
     """
-    query_vector = membed_text(pregunta).tolist()
+    query_vector = embed_text(pregunta)
 
     search_result = client.search(
         collection_name=COLLECTION_NAME,
