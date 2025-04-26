@@ -1,6 +1,5 @@
 # === Imports ===
-from chromadb import Client
-from chromadb.config import Settings
+import chromadb
 from sentence_transformers import SentenceTransformer
 from pathlib import Path
 
@@ -12,24 +11,26 @@ EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
 def crear_chromadb_prueba() -> None:
     """Create a simple ChromaDB collection with sample documents."""
+    
     # Ensure directory exists
     print(f"🔵 Intentando crear carpeta en: {CHROMA_DIR}")
     Path(CHROMA_DIR).mkdir(parents=True, exist_ok=True)
     print("🟢 Carpeta creada o ya existente.")
-
+    
     # Initialize ChromaDB
-    settings = Settings(
-        chroma_db_impl="duckdb+parquet",
-        persist_directory=CHROMA_DIR,
-        anonymized_telemetry=False
-    )
-    client = Client(settings)
+    print("🔵 Inicializando cliente de ChromaDB...")
+    client = chromadb.PersistentClient(path=CHROMA_DIR)
+    print("🟢 Cliente de ChromaDB inicializado.")
     
     # Initialize collection
+    print("🔵 Creando o cargando colección...")
     collection = client.get_or_create_collection(name="itsmehi_collection")
+    print("🟢 Colección cargada o creada.")
     
     # Initialize embedding model
+    print("🔵 Cargando modelo de embeddings...")
     model = SentenceTransformer(EMBEDDING_MODEL)
+    print("🟢 Modelo de embeddings cargado.")
     
     # Sample documents (simulate CV + job offer)
     documentos = [
@@ -40,16 +41,20 @@ def crear_chromadb_prueba() -> None:
     ]
     
     # Create embeddings
+    print("🔵 Generando embeddings de documentos...")
     embeddings = model.encode(documentos).tolist()
+    print("🟢 Embeddings generados.")
     
     # Add documents to collection
+    print("🔵 Añadiendo documentos a la colección...")
     collection.add(
         documents=documentos,
         embeddings=embeddings,
         ids=[f"doc_{i}" for i in range(len(documentos))]
     )
-    
-    # Save database to disk
-    client.persist()
+    print("🟢 Documentos añadidos a la colección.")
 
     print("✅ Base de prueba de ChromaDB creada en data/chromadb/")
+
+if __name__ == "__main__":
+    crear_chromadb_prueba()

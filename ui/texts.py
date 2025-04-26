@@ -10,8 +10,8 @@ Attributes:
 
 TEXTOS = {
     "bienvenida_titulo": {
-        "es": "👋 ¡Hola! Soy Manuel Cruz Rodríguez.",
-        "en": "👋 Hi there! I'm Manuel Cruz Rodríguez."
+        "es": "👋 ¡Hola! Soy Manuel Cruz Rodríguez",
+        "en": "👋 Hi there! I'm Manuel Cruz Rodríguez"
     },
     "bienvenida_descripcion": {
         "es": (
@@ -32,11 +32,7 @@ TEXTOS = {
         "en": "⚠️ Note: This conversation may be recorded for quality and improvement purposes."
     },
     "boton_empezar": {
-        "es": "Empezar Chat",
-        "en": "Start Chat"
-    },
-    "input_pregunta": {
-        "es": "Escribe tu pregunta aquí...",
-        "en": "Type your question here..."
+        "es": "Empezar chat",
+        "en": "Start chat"
     }
 }

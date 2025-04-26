@@ -22,6 +22,7 @@ def cargar_configuracion() -> dict:
         "proyecto_nombre_publico": "It's Me, Hi",
         "idioma_por_defecto": "es",
         "path_chromadb": Path("data/chromadb/"),  
-        "path_logs": Path("logs/itsmehi_chat_logs.csv")
+        "path_logs": Path("logs/itsmehi_chat_logs.csv"),
+        "nombre_bot": "Doppelganger"
     }
     return configuracion
