@@ -18,9 +18,8 @@ from vector_db.embedding_client import embed_text
 
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams
-from google.generativeai import GenerativeModel
-from google.api_core.exceptions import ResourceExhausted
-import google.generativeai as genai
+from vector_db.generate_response_hf import generar_respuesta_hf
+
 
 # === Load Environment Variables ===
 load_dotenv()
@@ -80,26 +79,22 @@ def buscar_contexto_relevante(pregunta: str, client: QdrantClient, k: int = 3) -
 MAX_CONTEXT_LENGTH = 3000  # Limitar a 3000 caracteres
 
 def generar_respuesta(contexto: List[str], pregunta: str) -> str:
-    """Generate a response using Gemini based on retrieved context and the question."""
+    """Generate a response using Hugging Face Inference API based on retrieved context and the question."""
     contexto_unido = "\n".join(contexto)
 
     # Cut context if it's too large
     if len(contexto_unido) > MAX_CONTEXT_LENGTH:
         contexto_unido = contexto_unido[:MAX_CONTEXT_LENGTH]
 
-    modelo = GenerativeModel(model_name="gemini-pro")  # Asegúrate que es gemini-pro
-
     prompt = (
-        f"Usando únicamente la siguiente información de contexto:\n\n"
-        f"{contexto_unido}\n\n"
-        f"Responde de forma clara y profesional a esta pregunta:\n"
-        f"{pregunta}"
+        f"Usa la siguiente información de contexto para responder de forma clara y profesional.\n\n"
+        f"Contexto:\n{contexto_unido}\n\n"
+        f"Pregunta: {pregunta}\n"
+        f"Respuesta:"
     )
 
     try:
-        respuesta = modelo.generate_content(prompt)
-        return respuesta.text.strip()
-    except ResourceExhausted:
-        return "🚦 Hemos alcanzado el límite de generación. Intenta de nuevo en unos segundos."
+        respuesta = generar_respuesta_hf(prompt)
+        return respuesta
     except Exception:
         return "⚡ El modelo no respondió a tiempo. Por favor, inténtalo de nuevo en unos minutos."
