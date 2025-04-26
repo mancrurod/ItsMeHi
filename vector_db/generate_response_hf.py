@@ -9,15 +9,14 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 # === Load Environment Variables ===
-HF_API_TOKEN = os.getenv("HUGGINGFACEHUB_API_TOKEN")
+HF_API_TOKEN = os.getenv("HF_API_TOKEN")
 HF_GENERATION_MODEL = os.getenv("HF_GENERATION_MODEL")
 
 # === Initialize Hugging Face Client ===
-client = InferenceClient(token=HUGGINGFACE_API_TOKEN)
+client = InferenceClient(token=HF_API_TOKEN)
 
 # === Constants ===
-MAX_OUTPUT_TOKENS = 100  # Falcon models are relatively large, keep response small
-
+MAX_OUTPUT_TOKENS = 100
 
 def generar_respuesta_hf(contexto: List[str], pregunta: str) -> str:
     """
