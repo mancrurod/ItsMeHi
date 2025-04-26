@@ -15,6 +15,8 @@ from typing import List
 
 from dotenv import load_dotenv
 from sentence_transformers import SentenceTransformer
+# Load model forcing CPU
+model = SentenceTransformer('all-MiniLM-L6-v2', device='cpu')
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams
 from google.generativeai import GenerativeModel

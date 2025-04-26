@@ -1,4 +1,4 @@
 __pycache__
 .env
-logs/
 data/
+logs/itsmehi_chat_logs.csv
