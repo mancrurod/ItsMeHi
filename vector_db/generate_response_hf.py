@@ -9,9 +9,9 @@ import streamlit as st
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, pipeline
 
 # === Model loader with cache ===
-@st.cache_resource(show_spinner="🔄 Loading local model...")
+@st.cache_resource(show_spinner="🔄 Loading local model (flan-t5-base)...")
 def cargar_modelo():
-    ruta = "models/flan-t5-small"
+    ruta = "models/flan-t5-base"
     tokenizer = AutoTokenizer.from_pretrained(ruta)
     modelo = AutoModelForSeq2SeqLM.from_pretrained(ruta)
     return pipeline("text2text-generation", model=modelo, tokenizer=tokenizer)
