@@ -1,34 +1,50 @@
 # vector_db/embedding_client.py
 
 import os
-from huggingface_hub import InferenceClient
-from dotenv import load_dotenv
 from typing import List
+from dotenv import load_dotenv
+from huggingface_hub import InferenceClient
+import streamlit as st
 
 # === Load environment variables ===
 load_dotenv()
 
-# === Connect to Hugging Face Inference API ===
-api_token = os.getenv("HF_API_TOKEN")
-model_name = os.getenv("HF_EMBEDDING_MODEL")
+# === Constants ===
+token_api = os.getenv("HF_API_TOKEN")
+modelo_embeddings = os.getenv("HF_EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
 
-client = InferenceClient(token=api_token)
+# === Cached Hugging Face client ===
+@st.cache_resource(show_spinner="🔗 Connecting to Hugging Face embedding model...")
+def get_cliente_inferencia() -> InferenceClient:
+    return InferenceClient(token=token_api)
 
-def embed_text(text: str) -> List[float]:
-    """Generate embeddings using Hugging Face Inference API."""
-    if not text:
+# === Embedding function ===
+def embed_texto(texto: str) -> List[float]:
+    """
+    Generate an embedding vector for a given input text using Hugging Face Inference API.
+
+    Args:
+        texto (str): The text to embed.
+
+    Returns:
+        List[float]: The embedding vector as a list of floats, or an empty list on failure.
+    """
+    if not texto:
         return []
+
+    cliente = get_cliente_inferencia()
+
     try:
-        embedding = client.feature_extraction(text=text, model=model_name)
-        
+        embedding = cliente.feature_extraction(text=texto, model=modelo_embeddings)
+
         if hasattr(embedding, "tolist"):
             embedding = embedding.tolist()
 
         if not embedding or not isinstance(embedding, list):
-            raise ValueError("Embedding failed or empty.")
+            raise ValueError("⚠️ Invalid or empty embedding.")
 
         return embedding
-    except Exception as e:
-        logger.error(f"⚡ Error generating embedding: {e}")
-        return None
 
+    except Exception as error:
+        print(f"⚡ Error generating embedding: {error}")
+        return None

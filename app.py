@@ -102,14 +102,21 @@ def main() -> None:
             thinking_placeholder = st.empty()
             thinking_placeholder.info("🤖 Pensando...")
 
+        try:
             contexto = buscar_contexto_relevante(st.session_state["input_text"], qdrant_client)
             respuesta = generar_respuesta(contexto, st.session_state["input_text"])
+        except Exception as e:
+            respuesta = "⚠️ Ha ocurrido un error al generar la respuesta. Inténtalo más tarde."
+            st.error(f"❌ Error técnico: {e}")
 
             thinking_placeholder.empty()
 
             st.session_state["historial_chat"].append((st.session_state["input_text"], respuesta))
-            log_to_google_sheet(st.session_state["input_text"], respuesta)
-
+            try:
+                log_to_google_sheet(st.session_state["input_text"], respuesta)
+            except Exception as e:
+                st.warning(f"⚠️ No se pudo registrar la conversación en Sheets: {e}")
+                
             # Reset states after processing
             st.session_state["input_text"] = ""
             st.session_state["input_ready"] = False
